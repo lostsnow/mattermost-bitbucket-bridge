@@ -1,0 +1,18 @@
+version: "3"
+
+services:
+
+  app:
+    build: .
+    read_only: true
+    restart: unless-stopped
+    ports:
+      - 127.0.0.1:50106:80
+    volumes:
+      - "./:/app"
+    networks:
+      - default-network
+
+networks:
+  default-network:
+    external: true
