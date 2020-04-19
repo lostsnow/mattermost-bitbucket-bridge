@@ -120,7 +120,7 @@ def process_payload_cloud(hook_path, data, event_key):
     """
     text = ""
     attachment = {}
-    
+
     event_name = get_event_action_text(event_key)
     actor_name = data["actor"]["display_name"]
     actor_url = data["actor"]["links"]["html"]["href"]
@@ -141,7 +141,7 @@ def process_payload_cloud(hook_path, data, event_key):
         pr_url = data["pullrequest"]["links"]["html"]["href"]
 
         text = event_name.format("[" + actor_name + "](" + actor_url + ")", "[#" + pr_id + "](" + pr_url + ")")
-        
+
         color = ''
         if event_key == 'pullrequest:approved' or event_key == 'pullrequest:merged':
             color = 'good'
@@ -185,9 +185,9 @@ def process_payload_cloud(hook_path, data, event_key):
                             "short": False,
                             "title": "Comment",
                             "value": comment_text
-                        }]                
+                        }]
 
-    elif event_key.startswith('repo:commit_status_'):        
+    elif event_key.startswith('repo:commit_status_'):
         commit_author_name = data["commit_status"]["commit"]["author"]["user"]["display_name"]
         commit_author_url = data["commit_status"]["commit"]["author"]["user"]["links"]["html"]["href"]
         commit_author_icon_url = data["commit_status"]["commit"]["author"]["user"]["links"]["avatar"]["href"]
@@ -230,15 +230,15 @@ def process_payload_cloud(hook_path, data, event_key):
         push_commit_date = data["push"]["changes"][0]["new"]["target"]["date"]
         push_commit_repository = data["repository"]["name"]
         push_commit_repository_url = data["repository"]["links"]["html"]["href"]
-        
+
         # Following code strip the last +HH:MM(timezone offset) of date string and then convert
         # it to datetime object in pyhton.
         date_sub_string_index = push_commit_date.find('+')
         push_commit_date = push_commit_date[:date_sub_string_index]
         push_commit_date_obj = datetime.datetime.strptime(push_commit_date, '%Y-%m-%dT%H:%M:%S')
-        
+
         text = event_name.format("[" + push_commit_repository + "](" + push_commit_repository_url + ")","[" + actor_name + "](" + actor_url + ")")
-        
+
         attachment = {
                 "author_name": actor_name,
                 "author_icon": push_author_icon_url,
@@ -249,7 +249,7 @@ def process_payload_cloud(hook_path, data, event_key):
                     {
                       "short":True,
                       "title":"Branch",
-                      "value":push_commit_branch_name 
+                      "value":push_commit_branch_name
                     },
                     {
                       "short":True,
@@ -330,6 +330,10 @@ def hooks(hook_path):
                 response = process_payload_cloud(hook_path, data, event)
     return ""
 
+@app.route('/', methods=['GET'])
+def index():
+    return "mattermost-bitbucket-bridge"
+
 if __name__ == '__main__':
-   app.run(host = application_host, port = application_port, 
+   app.run(host = application_host, port = application_port,
            debug = application_debug)
